@@ -20,7 +20,7 @@ const Order = db.define(
     },
 
     resi_code: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING(30),
       unique: true,
       allowNull: false,
     },

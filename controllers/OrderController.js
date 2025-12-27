@@ -26,13 +26,14 @@ export const getOrders = async (req, res) => {
 };
 
 export const getOrderById = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const [rows] = await db.query("SELECT * FROM orders WHERE order_id = :id", {
-            replacements: { id: id },
+    try {        
+        const response = await Order.findOne({
+            where: {
+                order_id: req.params.id
+            }
         });
 
-        if (rows.length === 0) {
+        if (!response) {
             return res.status(404).json({
                 msg: "Order tidak ditemukan",
             });
@@ -40,23 +41,24 @@ export const getOrderById = async (req, res) => {
 
         res.status(200).json({
             msg: "Detail Order ditemukan",
-            data: rows[0],
+            data: response
         });
+        
     } catch (error) {
-        console.log(error);
         res.status(500).json({ msg: "Terjadi kesalahan server" });
     }
 };
 
 export const getOrderByResi = async (req, res) => {
     try {
-        const { resi_code } = req.params;
 
-        const [rows] = await db.query(
-            "SELECT * FROM orders WHERE resi_code = :resi", {
-            replacements: { resi: resi_code }
+        const response = await Order.findOne({
+            where: {
+                resi_code: req.params.resi_code
+            }
         });
-        if (rows.length === 0) {
+
+        if (!response) {
             return res.status(404).json({
                 msg: "Nomor Resi tidak ditemukan",
             });
@@ -64,10 +66,9 @@ export const getOrderByResi = async (req, res) => {
 
         res.status(200).json({
             msg: "Nomor Resi ditemukan",
-            data: rows[0],
+            data: response,
         });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ msg: "Terjadi Kesalahan Server" });
     }
 };
@@ -85,18 +86,10 @@ export const createOrder = async (req, res) => {
         dropoff_long,
     } = req.body;
 
-    // 1. Generate Resi Code Unik (Format: LGT + Timestamp + Random)
-    // Contoh: LGT-17028392-AB12
     const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
     const resi = `LGT-${Date.now()}-${randomStr}`;
 
-    // 2. Hitung Estimasi Harga (Sederhana Dulu)
-    // Rumus: Berat * 5000 + Biaya Admin 2000
-    // Nanti di Fase Maps kita hitung pake Jarak KM
     const harga = berat_paket_kg * 5000 + 2000;
-
-    console.log("isi resi code", resi);
-    console.log("panjang resi code", resi.length);
 
     try {
         await Order.create({

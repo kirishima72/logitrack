@@ -1,3 +1,4 @@
+import db from "../config/Database.js";
 import Order from "../models/OrderModel.js";
 import User from "../models/UserModel.js";
 import { Op } from "sequelize"; // Operator logic Sequelize
@@ -24,6 +25,53 @@ export const getOrders = async (req, res) => {
     }
 };
 
+export const getOrderById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [rows] = await db.query("SELECT * FROM orders WHERE order_id = :id", {
+            replacements: { id: id },
+        });
+
+        if (rows.length === 0) {
+            return res.status(404).json({
+                msg: "Order tidak ditemukan",
+            });
+        }
+
+        res.status(200).json({
+            msg: "Detail Order ditemukan",
+            data: rows[0],
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Terjadi kesalahan server" });
+    }
+};
+
+export const getOrderByResi = async (req, res) => {
+    try {
+        const { resi_code } = req.params;
+
+        const [rows] = await db.query(
+            "SELECT * FROM orders WHERE resi_code = :resi", {
+            replacements: { resi: resi_code }
+        });
+        if (rows.length === 0) {
+            return res.status(404).json({
+                msg: "Nomor Resi tidak ditemukan",
+            });
+        }
+
+        res.status(200).json({
+            msg: "Nomor Resi ditemukan",
+            data: rows[0],
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Terjadi Kesalahan Server" });
+    }
+};
+
 export const createOrder = async (req, res) => {
     // Data dari input user (Frontend)
     const {
@@ -47,8 +95,8 @@ export const createOrder = async (req, res) => {
     // Nanti di Fase Maps kita hitung pake Jarak KM
     const harga = berat_paket_kg * 5000 + 2000;
 
-    console.log('isi resi code', resi);
-    console.log('panjang resi code', resi.length);
+    console.log("isi resi code", resi);
+    console.log("panjang resi code", resi.length);
 
     try {
         await Order.create({

@@ -1,4 +1,5 @@
 import User from "../models/UserModel.js";
+import Driver from "../models/DriverModel.js";
 import argon2 from "argon2";
 
 export const getUsers = async (req, res) => {
@@ -49,8 +50,6 @@ export const login = async (req, res) => {
             where: { email: email },
         });
 
-        console.log('isi findUser', findUser);
-
         //2. Jika user tidak ditemukan, maka error
         if (!findUser)
             return res.status(404).json({ msg: "User tidak ditemukan" });
@@ -95,6 +94,30 @@ export const getCurrentUser = async (req, res) => {
     if(!user) return res.status(404).json({msg: "User tidak ditemukan"});
     res.status(200).json(user);
 }
+
+export const activateDriver = async (req, res) => {
+    try {
+        const drivers = await Driver.findOne({
+            where: {
+                driver_id: req.body.driverId
+            }
+        });
+
+        if(!drivers) {
+            return res.status(404).json({msg: "Driver tidak ditemukan"});
+        }
+
+        await Driver.update(
+            { is_active: true },
+            { where: { driver_id: req.body.driverId } }
+        );
+
+        res.status(200).json({msg: "Driver berhasil diaktifkan"});
+
+    } catch (error) {
+        res.status(500).json({ msg:"Terjadi kesalahan saat mengaktifkan driver" });
+    }
+};
 
 export const logOut = (req, res) => {
     req.session.destroy((err)=>{

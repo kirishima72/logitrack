@@ -9,6 +9,7 @@ import Driver from "./models/DriverModel.js";
 import Order from "./models/OrderModel.js";
 import UserRoute from "./routes/UserRoute.js";
 import OrderRoute from "./routes/OrderRoute.js";
+import DriverRoute from "./routes/DriverRoute.js";
 
 dotenv.config();
 const app = express();
@@ -36,6 +37,7 @@ app.use(cors({
 app.use(express.json());
 app.use(UserRoute);
 app.use(OrderRoute);
+app.use(DriverRoute);
 
 // Generate Tabel Session Otomatis
 // store.sync(); // Nyalakan ini SEKALI aja pas pertama kali run, terus komen lagi biar gak berat.

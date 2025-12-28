@@ -1,7 +1,5 @@
-import db from "../config/Database.js";
 import Order from "../models/OrderModel.js";
 import User from "../models/UserModel.js";
-import { Op } from "sequelize"; // Operator logic Sequelize
 
 export const getOrders = async (req, res) => {
     try {
@@ -26,11 +24,11 @@ export const getOrders = async (req, res) => {
 };
 
 export const getOrderById = async (req, res) => {
-    try {        
+    try {
         const response = await Order.findOne({
             where: {
-                order_id: req.params.id
-            }
+                order_id: req.params.id,
+            },
         });
 
         if (!response) {
@@ -41,9 +39,8 @@ export const getOrderById = async (req, res) => {
 
         res.status(200).json({
             msg: "Detail Order ditemukan",
-            data: response
+            data: response,
         });
-        
     } catch (error) {
         res.status(500).json({ msg: "Terjadi kesalahan server" });
     }
@@ -51,11 +48,10 @@ export const getOrderById = async (req, res) => {
 
 export const getOrderByResi = async (req, res) => {
     try {
-
         const response = await Order.findOne({
             where: {
-                resi_code: req.params.resi_code
-            }
+                resi_code: req.params.resi_code,
+            },
         });
 
         if (!response) {
@@ -109,5 +105,99 @@ export const createOrder = async (req, res) => {
         res.status(201).json({ msg: "Order Berhasil Dibuat", resi: resi });
     } catch (error) {
         res.status(500).json({ msg: error.message });
+    }
+};
+
+export const acceptOrder = async (req, res) => {
+    try {
+        const order = await Order.findOne({
+            where: {
+                order_id: req.params.id,
+                status: 'finding_driver'
+            }
+        });
+
+        if (!order) {
+            return res.status(404).json({ msg: "Order tidak ditemukan atau sudah diambil driver lain." });
+        }
+
+        await Order.update({
+            status: "pickup",
+            driver_id: req.driverId  // Ambil ID Driver dari session login
+        }, {
+            where: {
+                order_id: order.order_id
+            }
+        });
+
+        res.status(200).json({ msg: "Order berhasil diterima! Silakan menuju lokasi pickup." });
+
+    } catch (error) {
+        res.status(500).json({ msg: "Terjadi kesalahan server" });
+    }
+}
+
+export const updateStatus = async (req, res) => {
+    try {
+        const order = await Order.findOne({
+            where: {
+                order_id: req.params.id,
+            },
+        });
+
+        if (!order)
+            return res.status(404).json({ msg: "Order tidak ditemukan" });
+
+        const { status } = req.body;
+
+        await Order.update(
+            { status: status },
+            {
+                where: {
+                    order_id: req.params.id,
+                },
+            }
+        );
+
+        res.status(200).json({ msg: "Status Order berhasil diperbarui" });
+    } catch (error) {
+        res.status(500).json({ msg: "Terjadi kesalahan server" });
+    }
+};
+
+export const cancelOrder = async (req, res) => {
+    try {
+        const order = await Order.findOne({
+            where: {
+                order_id: req.params.id,
+            },
+        });
+
+        if (!order) res.status(404).json({ msg: "Order tidak ditemukan" });
+
+        if (req.role !== "admin" && order.user_id !== req.userId)
+            return res
+                .status(403)
+                .json({ msg: "Akses terlarang! Ini bukan order Anda." });
+
+        const nonCancellableStatus = ["in_transit", "delivered", "cancelled"];
+        if (nonCancellableStatus.includes(order.status)) {
+            return res
+                .status(400)
+                .json({
+                    msg: "Order tidak bisa dibatalkan karena sudah diproses atau selesai.",
+                });
+        }
+
+        await Order.update({ status: "cancelled" }, {
+            where: {
+                order_id: order.order_id
+            }
+        });
+
+        res.status(200).json({ msg: "Order berhasil dibatalkan" });
+
+    } catch (error) {
+        res.status(500).json({ msg: "Terjadi kesalahan server" });
     }
 };

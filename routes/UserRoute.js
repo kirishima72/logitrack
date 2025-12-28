@@ -4,17 +4,22 @@ import {
     register, 
     login,
     getCurrentUser,
-    logOut } from "../controllers/Users.js";
+    activateDriver,
+    logOut } from "../controllers/UserController.js";
+import { getDrivers } from "../controllers/DriverController.js";
 import { verifyUser, adminOnly } from "../middleware/AuthUser.js";
 
 const router = express.Router();
 
-router.get('/users', verifyUser, adminOnly, getUsers); // DIJAGA 2 SATPAM (Login + Admin)
-router.post("/users", register);
-router.post("/login", login);
+router.post("/users/login", login);
 
-router.get('/get-current-user', verifyUser, getCurrentUser); // DIJAGA 1 SATPAM (Login doang)
-router.delete('/logout', logOut);  // Logout
+router.post("/users", register);
+router.get('/users', verifyUser, adminOnly, getUsers); // DIJAGA 2 SATPAM (Login + Admin)
+router.get('/users/drivers', verifyUser, adminOnly, getDrivers); // DIJAGA 2 SATPAM (Login + Admin)
+router.get('/users/get-current-user', verifyUser, getCurrentUser); // DIJAGA 1 SATPAM (Login doang)
+router.post('/users/activate-driver', verifyUser, adminOnly, activateDriver); // DIJAGA 2 SATPAM (Login + Admin)
+
+router.delete('/users/logout', logOut);  // Logout
 
 // router.get("/users", getUsers); // Nanti bisa diakses di GET http://localhost:5000/users
 

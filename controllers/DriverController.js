@@ -68,6 +68,12 @@ export const loginDriver = async (req, res) => {
 
         if (!match) return res.status(400).json({ msg: "Password salah" });
 
+        if (!findDriver.is_active) {
+            return res.status(403).json({
+                msg: "Akun Anda belum diaktifkan oleh Admin. Silakan hubungi kantor.",
+            });
+        }
+
         req.session.driverId = findDriver.driver_id;
 
         const id = findDriver.driver_id;

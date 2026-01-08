@@ -1,4 +1,5 @@
 import express from "express";
+import fileUpload from "express-fileupload";
 import cors from "cors";
 import session from "express-session";
 import dotenv from "dotenv";
@@ -35,6 +36,9 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(fileUpload());
+app.use(express.static("public"));
+
 app.use(UserRoute);
 app.use(OrderRoute);
 app.use(DriverRoute);

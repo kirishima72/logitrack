@@ -6,6 +6,7 @@ import {
     getCurrentUser,
     activateDriver,
     logOut } from "../controllers/UserController.js";
+import { getDashboardStats } from "../controllers/AdminController.js";
 import { getDrivers } from "../controllers/DriverController.js";
 import { verifyUser, adminOnly } from "../middleware/AuthUser.js";
 
@@ -20,6 +21,8 @@ router.get('/users/get-current-user', verifyUser, getCurrentUser); // DIJAGA 1 S
 router.post('/users/activate-driver', verifyUser, adminOnly, activateDriver); // DIJAGA 2 SATPAM (Login + Admin)
 
 router.delete('/users/logout', logOut);  // Logout
+
+router.get('/admin/dashboard', verifyUser, adminOnly, getDashboardStats);
 
 // router.get("/users", getUsers); // Nanti bisa diakses di GET http://localhost:5000/users
 

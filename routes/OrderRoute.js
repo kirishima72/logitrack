@@ -11,11 +11,12 @@ import {
 } from "../controllers/OrderController.js";
 import { verifyUser, adminOnly } from "../middleware/AuthUser.js"; // Import Satpam
 import { verifyDriver } from "../middleware/AuthDriver.js"; // Import Satpam
+import { validateCreateOrder } from "../middleware/Validator.js"; // validator Order
 
 const router = express.Router();
 
 router.get("/orders", verifyUser, getOrders);
-router.post("/orders", verifyUser, createOrder);
+router.post("/orders", verifyUser, validateCreateOrder, createOrder);
 router.get("/orders/:id", getOrderById);
 router.get("/orders/track/:resi_code", getOrderByResi);
 router.patch("/orders/:id/accept", verifyDriver, acceptOrder);

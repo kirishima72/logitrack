@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Realtime LogiTrack</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        #log { 
+            border: 1px solid #ccc; 
+            padding: 10px; 
+            height: 300px; 
+            overflow-y: scroll; 
+            background: #f9f9f9; 
+        }
+        .notif {
+            padding: 10px;
+            margin-bottom: 5px;
+            background-color: #d4edda;
+            border-left: 5px solid #28a745;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <h1>📡 LogiTrack Real-time Monitor</h1>
+    <p>Buka file ini di Browser. Saat Driver menerima order di Postman, notifikasi akan muncul di sini tanpa refresh.</p>
+    <div id="log"></div>
+
+    <script>
+        // Koneksi ke Backend
+        const socket = io("http://localhost:5000");
+
+        const logDiv = document.getElementById("log");
+
+        socket.on("connect", () => {
+            console.log("Terhubung ke server dengan ID:", socket.id);
+            logDiv.innerHTML += `<p style="color:blue">✅ Connected to Server</p>`;
+        });
+
+        // DENGARKAN EVENT "order_taken" DARI CONTROLLER
+        socket.on("order_taken", (data) => {
+            console.log("Dapat Notif:", data);
+            
+            const html = `
+                <div class="notif">
+                    <strong>🔔 DRIVER DITEMUKAN!</strong><br>
+                    Resi: <b>${data.resi}</b><br>
+                    Driver: ${data.driver_name} (${data.plat_nomor})<br>
+                    Pesan: ${data.message}
+                </div>
+            `;
+            logDiv.innerHTML += html;
+        });
+
+        socket.on("disconnect", () => {
+            logDiv.innerHTML += `<p style="color:red">❌ Disconnected</p>`;
+        });
+    </script>
+</body>
+</html>

@@ -164,6 +164,24 @@ export const acceptOrder = async (req, res) => {
             }
         );
 
+        // Cari data driver biar notifikasinya lengkap (ada nama & plat nomor)
+        const driverInfo = await User.findOne({
+            where: {
+                user_id: req.driverId,
+            }
+        });
+
+        // "Tembak" event ke semua orang yang sedang connect
+        // Nama eventnya: "order_taken" (nanti Frontend dengerin event ini)
+        req.io.emit("order_taken", {
+            message: `Order ${order.resi_code} telah diterima driver!`,
+            order_id: order.order_id,
+            resi: order.resi_code,
+            driver_name: driverInfo.driver_name,
+            plat_nomor: driverInfo.vehicle_number,
+            status: "pickup"
+        });
+
         res.status(200).json({
             msg: "Order berhasil diterima! Silakan menuju lokasi pickup.",
         });

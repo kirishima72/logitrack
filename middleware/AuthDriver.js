@@ -17,6 +17,7 @@ export const verifyDriver = async (req, res, next) => {
         return res.status(403).json({ msg: "Akun Driver Anda belum aktif." });
 
     req.driverId = driver.driver_id;
+    req.role = 'driver'; 
     next();
 
 };

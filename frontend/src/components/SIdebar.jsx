@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { IoHome, IoPricetag, IoPerson, IoLogOut } from "react-icons/io5";
+import { IoBicycle } from "react-icons/io5";
 
 const Sidebar = () => {
     return (
@@ -51,6 +52,17 @@ const Sidebar = () => {
                         >
                             <IoPerson className="text-xl text-gray-500 group-hover:text-blue-700" />
                             <span className="ml-3">Users</span>
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink
+                            to="/drivers/market"
+                            className={({ isActive }) =>
+                                `flex items-center p-2 rounded-lg group ${isActive ? "bg-blue-100 text-blue-700" : "text-gray-900 hover:bg-gray-100"}`
+                            }
+                        >
+                            <IoBicycle className="text-xl text-gray-500 group-hover:text-blue-700" />
+                            <span className="ml-3">Bursa Order</span>
                         </NavLink>
                     </li>
                 </ul>

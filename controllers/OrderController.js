@@ -7,8 +7,9 @@ import fs from "fs";
 export const getOrders = async (req, res) => {
     try {
         let response;
+
         // Logika: Kalau Admin boleh lihat semua, Kalau Customer cuma lihat punya sendiri
-        if (req.role === "admin") {
+        if (req.role === "admin" || req.role === "driver") {
             response = await Order.findAll({
                 include: [{ model: User, attributes: ["full_name", "email"] }], // Join tabel User
             });

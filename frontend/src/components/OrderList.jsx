@@ -1,12 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Layout from "./Layout";
-import { IoAdd } from "react-icons/io5";
+import { IoAdd, IoCheckmarkDone, IoCloudUpload } from "react-icons/io5";
 import { formatRupiah } from "../features/CommonFunction";
 
 const OrderList = () => {
     const [orders, setOrders] = React.useState([]);
+
+    const [isUploadOpen, setIsUploadOpen] = useState(false);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
+    const [file, setFile] = useState(null);
 
     useEffect(() => {
         getOrders();
@@ -14,14 +18,53 @@ const OrderList = () => {
 
     const getOrders = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/orders/");
+
+            let response;
+
+            try {
+                const isAdminResponse = await axios.get("http://localhost:5000/users/get-current-user");
+                
+                response = await axios.get("http://localhost:5000/orders/");
+                setOrders(response.data);
+            } catch (error) {
+                const isDriverResponse = await axios.get("http://localhost:5000/drivers/get-current-driver");
+                
+                if (isDriverResponse.status === 200) {
+                    response = await axios.get("http://localhost:5000/drivers/orders/");
+                }
+                setOrders(response.data);
+            }
+            
+
+
             // Backend mungkin me-return { data: [...] } atau langsung [...]
             // Sesuaikan dengan struktur JSON backend Anda.
             // Jika backend return { msg: "...", data: [...] }, gunakan response.data.data
             // Jika backend return [...] (array langsung), gunakan response.data
-            setOrders(response.data);
         } catch (error) {
             console.log(error);
+        }
+    };
+
+    const handleFinish = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            await axios.patch(
+                `http://localhost:5000/orders/${selectedOrderId}/finish`,
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                },
+            );
+            alert("Order Selesai! Terima kasih.");
+            setIsUploadOpen(false);
+            getOrders(); // Refresh tabel
+        } catch (error) {
+            console.log(error);
+            alert("Gagal upload bukti.");
         }
     };
 
@@ -108,12 +151,73 @@ const OrderList = () => {
                                             Detail
                                         </Link>
                                     </td>
+                                    {/* ... di dalam map ... */}
+                                    <td className="px-6 py-4">
+                                        {/* Tombol Detail (User & Driver) */}
+                                        <Link
+                                            to={`/orders/${order.order_id}`}
+                                            className="font-medium text-blue-600 hover:underline mr-3"
+                                        >
+                                            Detail
+                                        </Link>
+
+                                        {/* Tombol Finish (Khusus Driver & Status Pickup/Transit) */}
+                                        {(order.status === "pickup" ||
+                                            order.status === "in_transit") && (
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedOrderId(
+                                                        order.order_id,
+                                                    );
+                                                    setIsUploadOpen(true);
+                                                }}
+                                                className="font-medium text-green-600 hover:underline"
+                                            >
+                                                Selesaikan
+                                            </button>
+                                        )}
+                                    </td>
                                 </tr>
                             ))
                         )}
                     </tbody>
                 </table>
             </div>
+            {/* MODAL UPLOAD BUKTI */}
+            {isUploadOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-xl w-96">
+                        <h3 className="text-lg font-bold mb-4">
+                            Upload Bukti Pengiriman 📸
+                        </h3>
+                        <form onSubmit={handleFinish}>
+                            <div className="mb-4">
+                                <input
+                                    type="file"
+                                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                    onChange={(e) => setFile(e.target.files[0])}
+                                    required
+                                />
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsUploadOpen(false)}
+                                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-2"
+                                >
+                                    <IoCloudUpload /> Kirim & Selesai
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </Layout>
     );
 };

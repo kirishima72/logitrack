@@ -122,7 +122,7 @@ export const createOrder = async (req, res) => {
             dropoff_lat: dropoff_lat,
             dropoff_long: dropoff_long,
 
-            status: "pending", // Default status
+            status: "finding_driver", // Default status
         });
         res.status(201).json({
             msg: "Order Berhasil Dibuat",

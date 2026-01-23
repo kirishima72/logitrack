@@ -3,6 +3,7 @@ import Layout from "./Layout";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { IoWallet, IoBagHandle, IoPeople, IoCarSport } from "react-icons/io5";
+import { formatRupiah } from "../features/CommonFunction";
 
 const Dashboard = () => {
     const [name, setName] = useState("");
@@ -36,7 +37,7 @@ const Dashboard = () => {
                 console.log("error : ", e);
                 // Jika gagal, mungkin dia Driver?
             }
-            
+
             // Cek apakah dia Driver?
             const responseDriver = await axios.get(
                 "http://localhost:5000/drivers/get-current-driver"
@@ -61,12 +62,12 @@ const Dashboard = () => {
         }
     };
 
-    const formatRupiah = (number) => {
-        return new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-        }).format(number);
-    };
+    // const formatRupiah = (number) => {
+    //     return new Intl.NumberFormat("id-ID", {
+    //         style: "currency",
+    //         currency: "IDR",
+    //     }).format(number);
+    // };
 
     return (
         <Layout>

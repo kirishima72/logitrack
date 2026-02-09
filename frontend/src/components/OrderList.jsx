@@ -143,14 +143,6 @@ const OrderList = () => {
                                             {order.status.replace("_", " ")}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <Link
-                                            to={`/orders/${order.order_id}`}
-                                            className="font-medium text-blue-600 hover:underline"
-                                        >
-                                            Detail
-                                        </Link>
-                                    </td>
                                     {/* ... di dalam map ... */}
                                     <td className="px-6 py-4">
                                         {/* Tombol Detail (User & Driver) */}

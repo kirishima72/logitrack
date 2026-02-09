@@ -4,6 +4,7 @@ import Dashboard from "./components/Dashboard";
 import OrderList from "./components/OrderList";
 import FormAddOrder from "./components/FormAddOrder";
 import DriverMarketplace from "./components/DriverMarketplace";
+import OrderDetail from "./components/OrderDetail";
 
 function App() {
     return (
@@ -15,6 +16,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/orders" element={<OrderList />} />
                 <Route path="/orders/add" element={<FormAddOrder />} />
+                <Route path="/orders/:id" element={<OrderDetail />} />
 
                 <Route path="/drivers/market" element={<DriverMarketplace />} />
             </Routes>

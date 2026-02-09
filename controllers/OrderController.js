@@ -98,7 +98,7 @@ export const createOrder = async (req, res) => {
         parseFloat(pickup_lat),
         parseFloat(pickup_long),
         parseFloat(dropoff_lat),
-        parseFloat(dropoff_long)
+        parseFloat(dropoff_long),
     );
 
     const harga = calculatePrice(dist);
@@ -127,11 +127,11 @@ export const createOrder = async (req, res) => {
         });
         res.status(201).json({
             msg: "Order Berhasil Dibuat",
-            data: { 
+            data: {
                 resi: resi,
                 jarak: finalDistance + " km",
-                harga: "Rp " + harga.toLocaleString()
-            }
+                harga: "Rp " + harga.toLocaleString(),
+            },
         });
     } catch (error) {
         res.status(500).json({ msg: error.message });
@@ -162,14 +162,14 @@ export const acceptOrder = async (req, res) => {
                 where: {
                     order_id: order.order_id,
                 },
-            }
+            },
         );
 
         // Cari data driver biar notifikasinya lengkap (ada nama & plat nomor)
         const driverInfo = await User.findOne({
             where: {
                 user_id: req.driverId,
-            }
+            },
         });
 
         // "Tembak" event ke semua orang yang sedang connect
@@ -180,7 +180,7 @@ export const acceptOrder = async (req, res) => {
             resi: order.resi_code,
             driver_name: driverInfo.driver_name,
             plat_nomor: driverInfo.vehicle_number,
-            status: "pickup"
+            status: "pickup",
         });
 
         res.status(200).json({
@@ -204,18 +204,48 @@ export const updateStatus = async (req, res) => {
 
         const { status } = req.body;
 
+        if (
+            status !== "finding_driver" &&
+            status !== "pickup" &&
+            status !== "delivery" &&
+            status !== "completed" &&
+            status !== "cancelled" &&
+            status !== "in_transit" &&
+            status !== "delivered"
+        ) {
+            return res.status(400).json({ msg: "Status tidak valid" });
+        }
+
+        if (status === "finding_driver") {
+            console.log("masuk sini");
+            await Order.update(
+                { status: status, driver_id: null },
+                {
+                    where: {
+                        order_id: req.params.id,
+                    },
+                },
+            );
+
+            return res
+                .status(200)
+                .json({ msg: "Status Order berhasil diperbarui" });
+        }
+
         await Order.update(
             { status: status },
             {
                 where: {
                     order_id: req.params.id,
                 },
-            }
+            },
         );
 
         res.status(200).json({ msg: "Status Order berhasil diperbarui" });
     } catch (error) {
         res.status(500).json({ msg: "Terjadi kesalahan server" });
+        console.log("======================");
+        console.log("errornya", error);
     }
 };
 
@@ -247,7 +277,7 @@ export const cancelOrder = async (req, res) => {
                 where: {
                     order_id: order.order_id,
                 },
-            }
+            },
         );
 
         res.status(200).json({ msg: "Order berhasil dibatalkan" });
@@ -311,7 +341,7 @@ export const finishOrder = async (req, res) => {
                         where: {
                             order_id: order.order_id,
                         },
-                    }
+                    },
                 );
 
                 res.status(200).json({

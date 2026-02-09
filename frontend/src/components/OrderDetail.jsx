@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Layout from "./Layout";
-import axios from "axios";
+import api from "../config/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { IoArrowBack, IoPerson, IoCall, IoTime } from "react-icons/io5";
 
@@ -17,7 +17,7 @@ const OrderDetail = () => {
 
     const getOrderById = async () => {
         try {
-            const response = await axios.get(
+            const response = await api.get(
                 `http://localhost:5000/orders/${id}`,
             );
             setOrder(response.data.data);

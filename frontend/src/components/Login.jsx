@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../config/axios";
 import { useNavigate } from "react-router-dom"; // Untuk pindah halaman
 
 const Login = () => {
@@ -23,7 +23,7 @@ const Login = () => {
                     ? "http://localhost:5000/drivers/login"
                     : "http://localhost:5000/users/login";
 
-            await axios.post(endpoint, {
+            await api.post(endpoint, {
                 email: email,
                 password: password,
             });

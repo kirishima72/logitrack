@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../config/axios";
 import { IoLogOutOutline } from "react-icons/io5";
 
 const Navbar = () => {
@@ -11,12 +11,12 @@ const Navbar = () => {
             // Kita coba logout ke kedua endpoint (User & Driver) biar aman
             // Idealnya backend punya 1 endpoint logout umum, tapi ini cara cepatnya
             try {
-                await axios.delete("http://localhost:5000/users/logout");
+                await api.delete("http://localhost:5000/users/logout");
             } catch (e) {
                 console.log("error : ", e);
             }
             try {
-                await axios.delete("http://localhost:5000/drivers/logout");
+                await api.delete("http://localhost:5000/drivers/logout");
             } catch (e) {
                 console.log("error", e);
             }

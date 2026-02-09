@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../config/axios";
 import Layout from "./Layout";
 import { IoAdd, IoCheckmarkDone, IoCloudUpload } from "react-icons/io5";
 import { formatRupiah } from "../features/CommonFunction";
@@ -18,24 +18,28 @@ const OrderList = () => {
 
     const getOrders = async () => {
         try {
-
             let response;
 
             try {
-                const isAdminResponse = await axios.get("http://localhost:5000/users/get-current-user");
-                
-                response = await axios.get("http://localhost:5000/orders/");
+                const isAdminResponse = await api.get(
+                    "http://localhost:5000/users/get-current-user",
+                );
+
+                if (isAdminResponse.status === 200)
+                    response = await api.get("http://localhost:5000/orders/");
                 setOrders(response.data);
             } catch (error) {
-                const isDriverResponse = await axios.get("http://localhost:5000/drivers/get-current-driver");
-                
+                const isDriverResponse = await api.get(
+                    "http://localhost:5000/drivers/get-current-driver",
+                );
+
                 if (isDriverResponse.status === 200) {
-                    response = await axios.get("http://localhost:5000/drivers/orders/");
+                    response = await api.get(
+                        "http://localhost:5000/drivers/orders/",
+                    );
                 }
                 setOrders(response.data);
             }
-            
-
 
             // Backend mungkin me-return { data: [...] } atau langsung [...]
             // Sesuaikan dengan struktur JSON backend Anda.
@@ -52,7 +56,7 @@ const OrderList = () => {
         formData.append("file", file);
 
         try {
-            await axios.patch(
+            await api.patch(
                 `http://localhost:5000/orders/${selectedOrderId}/finish`,
                 formData,
                 {

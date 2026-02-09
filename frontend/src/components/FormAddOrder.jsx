@@ -1,15 +1,10 @@
 import Layout from "./Layout";
-import axios from "axios";
-import { useState, useRef, useMemo } from "react";
+import api from "../config/axios";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-
-// --- FIX ICON LEAFLET YANG HILANG DI REACT ---
-// Ini bug bawaan library react-leaflet, harus di-fix manual gini:
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
 const pickupIcon = new L.Icon({
     iconUrl:
@@ -87,7 +82,7 @@ const FormAddOrder = () => {
     const saveOrder = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:5000/orders", {
+            await api.post("http://localhost:5000/orders", {
                 pickup_address: pickupAddr,
                 dropoff_address: dropoffAddr,
                 pickup_lat: pickupPos.lat,
@@ -201,7 +196,7 @@ const FormAddOrder = () => {
                 </div>
 
                 {/* --- KOLOM KANAN: PETA --- */}
-                <div className="bg-white p-4 rounded-lg shadow-md h-[500px] z-0">
+                <div className="bg-white p-4 rounded-lg shadow-md h-125 z-0">
                     <h2 className="text-sm text-gray-500 mb-2">
                         👇 Geser Pin Hijau (Jemput) & Merah (Tujuan) untuk
                         akurasi harga

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../config/axios";
 import Layout from "./Layout";
 import { useNavigate } from "react-router-dom";
 import { IoBicycle, IoTime } from "react-icons/io5";
@@ -15,7 +15,7 @@ const DriverMarketplace = () => {
     const getOpenOrders = async () => {
         try {
             // Ambil semua order
-            const response = await axios.get("http://localhost:5000/drivers/orders");
+            const response = await api.get("http://localhost:5000/drivers/orders");
             const allOrders = response.data.data || response.data;
 
             // Filter di Frontend: Hanya tampilkan yang statusnya 'finding_driver'
@@ -35,7 +35,7 @@ const DriverMarketplace = () => {
             return;
 
         try {
-            await axios.patch(`http://localhost:5000/orders/${orderId}/accept`);
+            await api.patch(`http://localhost:5000/orders/${orderId}/accept`);
             alert("Order Berhasil Diambil! Selamat bekerja ✊");
             navigate("/orders"); // Arahkan ke halaman 'Order Saya'
         } catch (error) {
@@ -89,7 +89,7 @@ const DriverMarketplace = () => {
 
                                 <div className="space-y-3 mb-6">
                                     <div className="flex gap-2">
-                                        <div className="mt-1 min-w-[10px] h-[10px] rounded-full bg-green-500"></div>
+                                        <div className="mt-1 min-w-2.5 h-2.5 rounded-full bg-green-500"></div>
                                         <div>
                                             <p className="text-xs text-gray-400">
                                                 Jemput
@@ -100,7 +100,7 @@ const DriverMarketplace = () => {
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
-                                        <div className="mt-1 min-w-[10px] h-[10px] rounded-full bg-red-500"></div>
+                                        <div className="mt-1 min-w-2.5 h-2.5 rounded-full bg-red-500"></div>
                                         <div>
                                             <p className="text-xs text-gray-400">
                                                 Tujuan

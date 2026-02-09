@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Layout from "./Layout";
-import axios from "axios";
+import api from "../config/axios";
 import { useNavigate } from "react-router-dom";
 import { IoWallet, IoBagHandle, IoPeople, IoCarSport } from "react-icons/io5";
 import { formatRupiah } from "../features/CommonFunction";
@@ -27,7 +27,7 @@ const Dashboard = () => {
         try {
             // Kita coba cek apakah dia User/Admin?
             try {
-                const response = await axios.get(
+                const response = await api.get(
                     "http://localhost:5000/users/get-current-user"
                 );
                 setName(response.data.full_name);
@@ -39,7 +39,7 @@ const Dashboard = () => {
             }
 
             // Cek apakah dia Driver?
-            const responseDriver = await axios.get(
+            const responseDriver = await api.get(
                 "http://localhost:5000/drivers/get-current-driver"
             );
             setName(responseDriver.data.driver_name);
@@ -53,7 +53,7 @@ const Dashboard = () => {
 
     const getStats = async () => {
         try {
-            const response = await axios.get(
+            const response = await api.get(
                 "http://localhost:5000/admin/dashboard"
             );
             setStats(response.data.data);

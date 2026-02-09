@@ -16,7 +16,7 @@ api.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             // Jika user maksa masuk tanpa login, atau session habis
             // Kita bisa redirect manual atau biarkan error handling component yang kerja
-            // window.location.href = "/"; // Uncomment jika ingin auto-kick keras
+            window.location.href = "/"; // Uncomment jika ingin auto-kick keras
         }
         return Promise.reject(error);
     },

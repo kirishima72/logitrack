@@ -20,31 +20,21 @@ const OrderList = () => {
         try {
             let response;
 
-            try {
-                const isAdminResponse = await api.get(
-                    "http://localhost:5000/users/get-current-user",
-                );
+            const user = await api.get(
+                "http://localhost:5000/get-current-login",
+            );
 
-                if (isAdminResponse.status === 200)
-                    response = await api.get("http://localhost:5000/orders/");
-                setOrders(response.data);
-            } catch (error) {
-                const isDriverResponse = await api.get(
-                    "http://localhost:5000/drivers/get-current-driver",
-                );
-
-                if (isDriverResponse.status === 200) {
-                    response = await api.get(
-                        "http://localhost:5000/drivers/orders/",
-                    );
-                }
-                setOrders(response.data);
+            if (user.data.role === "admin" || user.data.role === "customer") {
+                response = await api.get("http://localhost:5000/orders/");
             }
 
-            // Backend mungkin me-return { data: [...] } atau langsung [...]
-            // Sesuaikan dengan struktur JSON backend Anda.
-            // Jika backend return { msg: "...", data: [...] }, gunakan response.data.data
-            // Jika backend return [...] (array langsung), gunakan response.data
+            if (user.data.role === "driver") {
+                response = await api.get(
+                    "http://localhost:5000/drivers/orders/",
+                );
+            }
+
+            setOrders(response.data);
         } catch (error) {
             console.log(error);
         }

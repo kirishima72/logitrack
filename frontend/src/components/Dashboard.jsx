@@ -26,26 +26,13 @@ const Dashboard = () => {
     const getMe = async () => {
         try {
             // Kita coba cek apakah dia User/Admin?
-            try {
-                const response = await api.get(
-                    "http://localhost:5000/users/get-current-user"
-                );
-                setName(response.data.full_name);
-                setRole(response.data.role);
-                return; // Jika sukses, stop disini
-            } catch (e) {
-                console.log("error : ", e);
-                // Jika gagal, mungkin dia Driver?
-            }
 
-            // Cek apakah dia Driver?
-            const responseDriver = await api.get(
-                "http://localhost:5000/drivers/get-current-driver"
+            const response = await api.get(
+                "http://localhost:5000/get-current-login"
             );
-            setName(responseDriver.data.driver_name);
-            setRole("driver");
+            setName(response.data.full_name);
+            setRole(response.data.role);
         } catch (error) {
-            console.log("error user & driver : ", error);
             // Jika User & Driver gagal, tendang ke login
             navigate("/");
         }

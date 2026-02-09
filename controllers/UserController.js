@@ -79,50 +79,73 @@ export const login = async (req, res) => {
     } catch (error) {
         res.status(500).json({ msg: error.message });
     }
-}; 
+};
 
 export const getCurrentUser = async (req, res) => {
-    if(!req.session.userId){
-        return res.status(401).json({msg: "Mohon login ke akun Anda!"});
+    if (!req.session.userId) {
+        return res.status(401).json({ msg: "Mohon login ke akun Anda!" });
     }
     const user = await User.findOne({
-        attributes: ['user_id', 'full_name', 'email', 'role'], // Password jangan dikirim!
+        attributes: ["user_id", "full_name", "email", "role"], // Password jangan dikirim!
         where: {
-            user_id: req.session.userId
-        }
+            user_id: req.session.userId,
+        },
     });
-    if(!user) return res.status(404).json({msg: "User tidak ditemukan"});
+    if (!user) return res.status(404).json({ msg: "User tidak ditemukan" });
     res.status(200).json(user);
-}
+};
+
+export const getCurrentLogin = async (req, res) => {
+    if (req.session.userId) {
+        const user = await User.findOne({
+            attributes: ["full_name", "role"],
+            where: { user_id: req.session.userId },
+        });
+        return res.status(200).json({ name: user.full_name, role: user.role });
+    }
+
+    if (req.session.driverId) {
+        const driver = await Driver.findOne({
+            attributes: ["driver_name"],
+            where: { driver_id: req.session.driverId },
+        });
+        return res.status(200).json({
+            name: driver.driver_name,
+            role: "driver",
+        });
+    }
+
+    return res.status(401).json({ msg: "Mohon login ke akun Anda" });
+};
 
 export const activateDriver = async (req, res) => {
     try {
         const drivers = await Driver.findOne({
             where: {
-                driver_id: req.body.driverId
-            }
+                driver_id: req.body.driverId,
+            },
         });
 
-        if(!drivers) {
-            return res.status(404).json({msg: "Driver tidak ditemukan"});
+        if (!drivers) {
+            return res.status(404).json({ msg: "Driver tidak ditemukan" });
         }
 
         await Driver.update(
             { is_active: true },
-            { where: { driver_id: req.body.driverId } }
+            { where: { driver_id: req.body.driverId } },
         );
 
-        res.status(200).json({msg: "Driver berhasil diaktifkan"});
-
+        res.status(200).json({ msg: "Driver berhasil diaktifkan" });
     } catch (error) {
-        res.status(500).json({ msg:"Terjadi kesalahan saat mengaktifkan driver" });
+        res.status(500).json({
+            msg: "Terjadi kesalahan saat mengaktifkan driver",
+        });
     }
 };
 
 export const logOut = (req, res) => {
-    req.session.destroy((err)=>{
-        if(err) return res.status(400).json({msg: "Tidak dapat logout"});
-        res.status(200).json({msg: "Anda telah logout"});
+    req.session.destroy((err) => {
+        if (err) return res.status(400).json({ msg: "Tidak dapat logout" });
+        res.status(200).json({ msg: "Anda telah logout" });
     });
-}
-
+};

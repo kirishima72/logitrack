@@ -1,6 +1,7 @@
 import express from "express";
 import { 
     getUsers, 
+    getCurrentLogin,
     register, 
     login,
     getCurrentUser,
@@ -13,6 +14,8 @@ import { verifyUser, adminOnly } from "../middleware/AuthUser.js";
 const router = express.Router();
 
 router.post("/users/login", login);
+
+router.get('/get-current-login', getCurrentLogin);
 
 router.post("/users", register);
 router.get('/users', verifyUser, adminOnly, getUsers); // DIJAGA 2 SATPAM (Login + Admin)
